@@ -101,8 +101,8 @@ const Game = ({ onScoreChange,onLevelChange }) => {
             currentPosRef.current = { left: newLeft,top: newTop };
             setShapeStyles({ left: `${newLeft}%`,top: `${newTop}%` });
 
-            // Track trajectory in level 2 while no barrier is active
-            if (levelRef.current >= 2 && !barrierActiveRef.current) {
+            // Track trajectory in level 2 always (even while barriers are present)
+            if (levelRef.current >= 2) {
                 const now = Date.now();
                 if (now - lastTrajectoryTimeRef.current > 100) {
                     lastTrajectoryTimeRef.current = now;
@@ -132,22 +132,12 @@ const Game = ({ onScoreChange,onLevelChange }) => {
                     }
 
                     // Trajectory hardening logic (level 2 only)
-                    if (levelRef.current >= 2) {
-                        if (!barrierActiveRef.current) {
-                            // Harden the path the player traced
-                            if (trajectoryRef.current.length > 0) {
-                                hardBarriersRef.current = [...trajectoryRef.current];
-                                barrierActiveRef.current = true;
-                                barrierScoreCountRef.current = 0;
-                                setHardBarriers([...trajectoryRef.current]);
-                            }
-                        } else {
-                            // Clear barriers once next target is hit
-                            hardBarriersRef.current = [];
-                            barrierActiveRef.current = false;
-                            barrierScoreCountRef.current = 0;
-                            setHardBarriers([]);
-                        }
+                    // Every score hardens the current trajectory into barriers;
+                    // barriers are replaced each round, never cleared
+                    if (levelRef.current >= 2 && trajectoryRef.current.length > 0) {
+                        hardBarriersRef.current = [...trajectoryRef.current];
+                        barrierActiveRef.current = true;
+                        setHardBarriers([...trajectoryRef.current]);
                     }
 
                     // Reset trajectory for next round
