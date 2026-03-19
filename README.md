@@ -17,74 +17,40 @@ No buttons. No taps. Just you, gravity, and your steady hands.
 ## How to Play
 
 1. Open the game on your **mobile device**
-2. Hold your phone naturally, like you're reading it
-3. **Tilt left/right** to move the block horizontally
-4. **Tilt forward/back** to move it vertically
-5. Guide the white block into the red glowing square
-6. Score when at least **20% of the block overlaps** the target
-7. The target jumps to a new random position — do it again
+2. Tilt your phone to move the white block
+3. Guide it into the glowing red target
+4. Score when the block overlaps the target by **20% or more**
+5. Target jumps to a new spot — repeat
 
-The screen flashes green on every successful score. Feel the rush.
+The screen flashes green on every score.
 
 ---
 
-## Tech Stack
-
-| Layer | Tech |
-|---|---|
-| Framework | Next.js 14 |
-| UI | React 18 + CSS Modules |
-| Motion Input | Web Device Orientation API |
-| Animations | CSS + react-spinners |
-
----
-
-## Controls
-
-| Action | How |
-|---|---|
-| Move block left/right | Tilt phone left/right |
-| Move block up/down | Tilt phone forward/backward |
-| Score a point | Overlap block with red target (>20%) |
-
----
-
-## Game Design
-
-- **Shape**: 50×50px white glowing block
-- **Target**: 60×60px red glowing square, randomly repositioned on each score
-- **Sensitivity**: Tilt values divided by 10 for smooth, controlled movement
-- **Cooldown**: 1 second between successive scores (no spamming!)
-- **Collision**: Calculated using bounding box intersection math — partial overlaps count
-
----
-
-## Running Locally
+## Quick Start
 
 ```bash
 npm install
 npm run dev
 ```
 
-Then open on your phone (or use browser DevTools device emulation).
-
-> **Note**: Device orientation requires a real mobile device or browser emulation with motion sensors enabled. It won't work on a regular desktop browser.
+Open on your phone at `http://<your-ip>:3000`. Won't work on desktop — needs a real gyroscope.
 
 ---
 
-## Project Structure
+## Documentation
 
-```
-src/
-├── components/
-│   └── Game.js          # Core game loop and motion controls
-├── pages/
-│   └── index.js         # HUD overlay (level + score)
-└── styles/
-    ├── game.module.css   # Game canvas styles
-    ├── Home.module.css   # HUD styles
-    └── globals.css       # Global theme (dark mode, CSS vars)
-```
+| Doc | What's in it |
+|---|---|
+| [Gameplay Guide](docs/gameplay.md) | Controls, scoring rules, tips, game loop explained |
+| [Technical Reference](docs/technical.md) | Architecture, motion API, collision math, state management |
+| [Design System](docs/design.md) | Colors, typography, glow effects, UI principles |
+| [Contributing](docs/contributing.md) | Setup, project structure, roadmap, how to add features |
+
+---
+
+## Stack
+
+Next.js 14 · React 18 · Web Device Orientation API · CSS Modules
 
 ---
 
