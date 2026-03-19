@@ -60,8 +60,4 @@ Classic Tetris is about fitting blocks into the right places with precision and 
 
 ---
 
-*Made for fun. Play on mobile. Tilt responsibly.*
-
----
-
 *I made this for fun. My girlfriend came up with the name.*
