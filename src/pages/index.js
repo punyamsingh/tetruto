@@ -21,25 +21,21 @@ const Home = () => {
     <div className={styles.gameWrapper}>
       <Head>
         <title>TETRUTO</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </Head>
 
-      <header className={styles.header}>
-        <h1 className={styles.title}>TETRUTO</h1>
-        <div className={styles.hud}>
-          <div className={styles.hudItem}>
-            <span className={styles.hudLabel}>Level</span>
-            <span className={styles.hudValue}>{currentLevel}</span>
-          </div>
-          <div className={styles.hudItem}>
-            <span className={styles.hudLabel}>Score</span>
-            <span className={styles.hudValue}>{score}</span>
-          </div>
+      <div className={styles.hud}>
+        <span className={styles.title}>TETRUTO</span>
+        <div className={styles.hudStats}>
+          <span className={styles.hudStat}>LVL <strong>{currentLevel}</strong></span>
+          <span className={styles.hudStat}>SCORE <strong>{score}</strong></span>
         </div>
-      </header>
+      </div>
 
-      <main className={styles.gameArea}>
-        <Game onLevelChange={handleLevelChange} onScoreChange={handleScoreChange} />
-      </main>
+      <Game onLevelChange={handleLevelChange} onScoreChange={handleScoreChange} />
     </div>
   );
 };

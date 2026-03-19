@@ -4,63 +4,41 @@
   left: 0;
   width: 100%;
   height: 100%;
-  display: flex;
-  flex-direction: column;
-  background: #0a0a14;
   overflow: hidden;
-}
-
-.header {
-  position: relative;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem 1.25rem;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  flex-shrink: 0;
-}
-
-.title {
-  font-size: 1.25rem;
-  font-weight: 800;
-  letter-spacing: 0.25em;
-  color: #fff;
-  text-shadow:
-    0 0 20px rgba(52, 152, 219, 0.8),
-    0 0 40px rgba(52, 152, 219, 0.4);
+  background: #0a0a14;
 }
 
 .hud {
+  position: absolute;
+  top: 1rem;
+  left: 0;
+  right: 0;
+  z-index: 100;
   display: flex;
-  gap: 1.5rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.25rem;
+  pointer-events: none;
 }
 
-.hudItem {
+.title {
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.25em;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.hudStats {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.1rem;
+  gap: 1.25rem;
 }
 
-.hudLabel {
-  font-size: 0.6rem;
-  letter-spacing: 0.15em;
-  color: rgba(255, 255, 255, 0.4);
-  text-transform: uppercase;
+.hudStat {
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.35);
 }
 
-.hudValue {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #fff;
-  line-height: 1;
-}
-
-.gameArea {
-  position: relative;
-  flex: 1;
-  overflow: hidden;
+.hudStat strong {
+  color: rgba(255, 255, 255, 0.7);
 }
