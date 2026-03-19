@@ -159,13 +159,59 @@ const Game = ({ onScoreChange,onLevelChange }) => {
         };
     },[onScoreChange,onLevelChange]);
 
+    const holeCollidesWithBarriers = (leftPx,topPx) => {
+        const barriers = hardBarriersRef.current;
+        if (!barriers.length) return false;
+        const holeRight = leftPx + 60;
+        const holeBottom = topPx + 60;
+        for (const b of barriers) {
+            if (
+                holeRight > b.x - BARRIER_HALF &&
+                leftPx < b.x + BARRIER_HALF &&
+                holeBottom > b.y - BARRIER_HALF &&
+                topPx < b.y + BARRIER_HALF
+            ) {
+                return true;
+            }
+        }
+        return false;
+    };
+
+    const safeSpawnPosition = () => {
+        // Try the default center first, then random positions until clear of barriers
+        const candidates = [{ left: 40,top: 40 }];
+        for (let i = 0; i < 50; i++) {
+            candidates.push({
+                left: 5 + Math.random() * 85,
+                top: 5 + Math.random() * 85,
+            });
+        }
+        for (const pos of candidates) {
+            if (!wouldCollideWithBarriers(pos.left,pos.top)) return pos;
+        }
+        return candidates[candidates.length - 1];
+    };
+
+    const safeHolePosition = () => {
+        for (let i = 0; i < 50; i++) {
+            const left = Math.floor(Math.random() * (window.innerWidth - 70));
+            const top = Math.floor(Math.random() * (window.innerHeight - 70));
+            if (!holeCollidesWithBarriers(left,top)) {
+                return { left: `${left}px`,top: `${top}px` };
+            }
+        }
+        // Fallback: return last tried position if no clear spot found
+        return randomHolePosition();
+    };
+
     const resetGame = () => {
-        currentPosRef.current = { left: 40,top: 40 };
+        const pos = safeSpawnPosition();
+        currentPosRef.current = pos;
         setShapeStyles({
-            left: '40%',
-            top: '40%',
+            left: `${pos.left}%`,
+            top: `${pos.top}%`,
         });
-        setHoleStyles(randomHolePosition());
+        setHoleStyles(safeHolePosition());
     };
 
     const isInsideHole = () => {
