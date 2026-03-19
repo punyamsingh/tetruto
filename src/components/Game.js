@@ -13,8 +13,6 @@ const Game = ({ onScoreChange }) => {
     const [shapeStyles,setShapeStyles] = useState({
         left: '40%',
         top: '40%',
-        backgroundColor: '#fff',
-        zIndex: 1,
     });
     const [holeStyles,setHoleStyles] = useState(() => randomHolePosition());
 
@@ -79,8 +77,6 @@ const Game = ({ onScoreChange }) => {
         setShapeStyles({
             left: '40%',
             top: '40%',
-            backgroundColor: '#fff',
-            zIndex: 1,
         });
         setHoleStyles(randomHolePosition());
     };
