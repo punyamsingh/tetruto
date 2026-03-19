@@ -28,6 +28,11 @@ const Game = ({ onScoreChange,onLevelChange }) => {
     const barrierActiveRef = useRef(false);
     const barrierScoreCountRef = useRef(0);
     const lastTrajectoryTimeRef = useRef(0);
+    const onScoreChangeRef = useRef(onScoreChange);
+    const onLevelChangeRef = useRef(onLevelChange);
+
+    useEffect(() => { onScoreChangeRef.current = onScoreChange; },[onScoreChange]);
+    useEffect(() => { onLevelChangeRef.current = onLevelChange; },[onLevelChange]);
 
     useEffect(() => {
         setHoleStyles(randomHolePosition());
@@ -86,6 +91,11 @@ const Game = ({ onScoreChange,onLevelChange }) => {
             if (barrierActiveRef.current) {
                 if (wouldCollideWithBarriers(newLeft,prev.top)) newLeft = prev.left;
                 if (wouldCollideWithBarriers(prev.left,newTop)) newTop = prev.top;
+                // After axis-only slides, verify the combined position doesn't clip diagonally
+                if (wouldCollideWithBarriers(newLeft,newTop)) {
+                    newLeft = prev.left;
+                    newTop = prev.top;
+                }
             }
 
             currentPosRef.current = { left: newLeft,top: newTop };
@@ -112,13 +122,13 @@ const Game = ({ onScoreChange,onLevelChange }) => {
                     const newScore = scoreRef.current + 1;
                     scoreRef.current = newScore;
                     setScore(newScore);
-                    onScoreChange(newScore);
+                    onScoreChangeRef.current(newScore);
 
                     // Advance to level 2 at 3 points
                     if (newScore >= 3 && levelRef.current < 2) {
                         levelRef.current = 2;
                         setLevel(2);
-                        if (onLevelChange) onLevelChange(2);
+                        if (onLevelChangeRef.current) onLevelChangeRef.current(2);
                     }
 
                     // Trajectory hardening logic (level 2 only)
@@ -160,7 +170,7 @@ const Game = ({ onScoreChange,onLevelChange }) => {
         return () => {
             window.removeEventListener('deviceorientation',updatePosition);
         };
-    },[onScoreChange,onLevelChange]);
+    },[]);
 
     const holeCollidesWithBarriers = (leftPx,topPx) => {
         const barriers = hardBarriersRef.current;
@@ -181,18 +191,14 @@ const Game = ({ onScoreChange,onLevelChange }) => {
     };
 
     const safeSpawnPosition = () => {
-        // Try the default center first, then random positions until clear of barriers
         const candidates = [{ left: 40,top: 40 }];
         for (let i = 0; i < 50; i++) {
-            candidates.push({
-                left: 5 + Math.random() * 85,
-                top: 5 + Math.random() * 85,
-            });
+            candidates.push({ left: 5 + Math.random() * 85,top: 5 + Math.random() * 85 });
         }
         for (const pos of candidates) {
             if (!wouldCollideWithBarriers(pos.left,pos.top)) return pos;
         }
-        return candidates[candidates.length - 1];
+        return null;
     };
 
     const safeHolePosition = () => {
@@ -203,18 +209,20 @@ const Game = ({ onScoreChange,onLevelChange }) => {
                 return { left: `${left}px`,top: `${top}px` };
             }
         }
-        // Fallback: return last tried position if no clear spot found
-        return randomHolePosition();
+        return null;
     };
 
     const resetGame = () => {
         const pos = safeSpawnPosition();
-        currentPosRef.current = pos;
-        setShapeStyles({
-            left: `${pos.left}%`,
-            top: `${pos.top}%`,
-        });
-        setHoleStyles(safeHolePosition());
+        if (pos) {
+            currentPosRef.current = pos;
+            setShapeStyles({ left: `${pos.left}%`,top: `${pos.top}%` });
+        }
+        // On null keep the block at its current safe position (currentPosRef unchanged)
+
+        const hole = safeHolePosition();
+        if (hole) setHoleStyles(hole);
+        // On null keep the hole where it is rather than placing it on a barrier
     };
 
     const isInsideHole = () => {
