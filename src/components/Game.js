@@ -114,8 +114,8 @@ const Game = ({ onScoreChange,onLevelChange }) => {
                     setScore(newScore);
                     onScoreChange(newScore);
 
-                    // Advance to level 2 at 10 points
-                    if (newScore >= 10 && levelRef.current < 2) {
+                    // Advance to level 2 at 3 points
+                    if (newScore >= 3 && levelRef.current < 2) {
                         levelRef.current = 2;
                         setLevel(2);
                         if (onLevelChange) onLevelChange(2);
@@ -132,14 +132,11 @@ const Game = ({ onScoreChange,onLevelChange }) => {
                                 setHardBarriers([...trajectoryRef.current]);
                             }
                         } else {
-                            // Clear barriers after 3 points scored against them
-                            barrierScoreCountRef.current += 1;
-                            if (barrierScoreCountRef.current >= 3) {
-                                hardBarriersRef.current = [];
-                                barrierActiveRef.current = false;
-                                barrierScoreCountRef.current = 0;
-                                setHardBarriers([]);
-                            }
+                            // Clear barriers once next target is hit
+                            hardBarriersRef.current = [];
+                            barrierActiveRef.current = false;
+                            barrierScoreCountRef.current = 0;
+                            setHardBarriers([]);
                         }
                     }
 
