@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="TETRUTO icon">
+  <defs>
+    <filter id="glow-white" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="glow-red" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="7" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="120" height="120" fill="#0a0a14" rx="16"/>
+
+  <!-- Red target hole (68×68), centered -->
+  <rect x="26" y="26" width="68" height="68" rx="8"
+        fill="none"
+        stroke="#e74c3c" stroke-width="3"
+        filter="url(#glow-red)"/>
+
+  <!-- White player block (52×52), offset up-left — entering target -->
+  <rect x="18" y="18" width="52" height="52" rx="7"
+        fill="#ffffff"
+        filter="url(#glow-white)"/>
+</svg>
