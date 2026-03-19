@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 120" width="420" height="120" role="img" aria-label="TETRUTO logo">
+  <defs>
+    <filter id="glow-white" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="glow-red" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="glow-text" x="-10%" y="-30%" width="120%" height="160%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="420" height="120" fill="#0a0a14" rx="10"/>
+
+  <!-- Icon: Red target hole (64×64) centered in left column -->
+  <rect x="21" y="28" width="64" height="64" rx="7"
+        fill="none"
+        stroke="#e74c3c" stroke-width="2.5"
+        filter="url(#glow-red)"/>
+
+  <!-- Icon: White player block (50×50), offset up-left — mid-entry into target -->
+  <rect x="16" y="22" width="50" height="50" rx="6"
+        fill="#ffffff"
+        filter="url(#glow-white)"/>
+
+  <!-- Wordmark -->
+  <text
+    x="108" y="76"
+    font-family="ui-monospace, Menlo, Monaco, 'Cascadia Mono', 'Segoe UI Mono', monospace"
+    font-size="48"
+    font-weight="800"
+    fill="#ffffff"
+    letter-spacing="3"
+    filter="url(#glow-text)">TETRUTO</text>
+</svg>
