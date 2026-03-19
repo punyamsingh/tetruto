@@ -19,11 +19,11 @@ const Home = () => {
   return (
     <div>
       <Head>
-        <title>TETROX</title>
+        <title>TETRUTO</title>
       </Head>
 
       <main>
-        <h1>TETROX</h1>
+        <h1>TETRUTO</h1>
         <p>Level: {currentLevel}</p>
         <p>Score: {score}</p>
         <Game onLevelChange={handleLevelChange} onScoreChange={handleScoreChange} />
