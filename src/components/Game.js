@@ -2,6 +2,11 @@ import React,{ useState,useEffect } from 'react';
 import { BeatLoader } from 'react-spinners';
 import styles from '../styles/game.module.css';
 
+const randomHolePosition = () => ({
+    left: `${Math.floor(Math.random() * (window.innerWidth - 70))}px`,
+    top: `${Math.floor(Math.random() * (window.innerHeight - 70))}px`,
+});
+
 const Game = ({ onScoreChange }) => {
     const [loading,setLoading] = useState(true);
     const [score,setScore] = useState(0);
@@ -11,11 +16,7 @@ const Game = ({ onScoreChange }) => {
         backgroundColor: '#fff',
         zIndex: 1,
     });
-    const [holeStyles,setHoleStyles] = useState({
-        left: '40%',
-        top: '40%',
-        backgroundColor: '#fff',
-    });
+    const [holeStyles,setHoleStyles] = useState(() => randomHolePosition());
 
     useEffect(() => {
         const loadingTimeout = setTimeout(() => {
@@ -81,17 +82,7 @@ const Game = ({ onScoreChange }) => {
             backgroundColor: '#fff',
             zIndex: 1,
         });
-        createNewShape();
-    };
-
-    const createNewShape = () => {
-        const randomX = Math.floor(Math.random() * (window.innerWidth - 50));
-        const randomY = Math.floor(Math.random() * (window.innerHeight - 50));
-        setShapeStyles({
-            ...shapeStyles,
-            left: `${randomX}px`,
-            top: `${randomY}px`,
-        });
+        setHoleStyles(randomHolePosition());
     };
 
     const isInsideHole = () => {
@@ -137,7 +128,7 @@ const Game = ({ onScoreChange }) => {
             ) : (
                 <>
                     <div className={styles.shape} style={shapeStyles}></div>
-                    <div className={styles.hole} id={styles.hole}></div>
+                    <div className={styles.hole} id={styles.hole} style={holeStyles}></div>
                 </>
             )}
         </div>
