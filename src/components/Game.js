@@ -131,7 +131,8 @@ const Game = ({ onScoreChange }) => {
         <div className={styles.gameContainer} id={styles.gameContainer}>
             {loading ? (
                 <div className={styles.loaderContainer}>
-                    <BeatLoader color="#3498db" size={20} margin={5} />
+                    <BeatLoader color="#3498db" size={15} margin={4} />
+                    <span className={styles.loaderText}>Loading</span>
                 </div>
             ) : (
                 <>
