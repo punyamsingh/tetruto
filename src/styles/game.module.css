@@ -47,6 +47,31 @@
     box-shadow: 0 0 12px rgba(52, 152, 219, 0.7);
 }
 
+.trajectoryDot {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    background-color: rgba(52, 152, 219, 0.45);
+    border-radius: 50%;
+    z-index: 5;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+
+.hardBarrier {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    background-color: rgba(231, 76, 60, 0.88);
+    border-radius: 3px;
+    z-index: 6;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    box-shadow:
+        0 0 8px rgba(231, 76, 60, 0.7),
+        0 0 2px rgba(231, 76, 60, 1);
+}
+
 .loaderContainer {
     position: fixed;
     top: 50%;
