@@ -64,4 +64,4 @@ Classic Tetris is about fitting blocks into the right places with precision and 
 
 ---
 
-**Note:** I built this just for fun — no grand plan, no roadmap, just vibes. And the name TETRUTO? That was my girlfriend's idea. Credit where it's due.
+*I made this for fun. My girlfriend came up with the name.*
