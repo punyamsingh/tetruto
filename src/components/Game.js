@@ -26,6 +26,7 @@ const Game = ({ onScoreChange,onLevelChange }) => {
     const trajectoryRef = useRef([]);
     const hardBarriersRef = useRef([]);
     const barrierActiveRef = useRef(false);
+    const barrierScoreCountRef = useRef(0);
     const lastTrajectoryTimeRef = useRef(0);
 
     useEffect(() => {
@@ -107,7 +108,7 @@ const Game = ({ onScoreChange,onLevelChange }) => {
             const currentTime = Date.now();
             if (currentTime - lastAlignmentTime > cooldownDuration && isInsideHole()) {
                 const overlapPercentage = calculateOverlapPercentage();
-                if (overlapPercentage > 20) {
+                if (overlapPercentage > 10) {
                     const newScore = scoreRef.current + 1;
                     scoreRef.current = newScore;
                     setScore(newScore);
@@ -127,13 +128,18 @@ const Game = ({ onScoreChange,onLevelChange }) => {
                             if (trajectoryRef.current.length > 0) {
                                 hardBarriersRef.current = [...trajectoryRef.current];
                                 barrierActiveRef.current = true;
+                                barrierScoreCountRef.current = 0;
                                 setHardBarriers([...trajectoryRef.current]);
                             }
                         } else {
-                            // Clear barriers once next target is hit
-                            hardBarriersRef.current = [];
-                            barrierActiveRef.current = false;
-                            setHardBarriers([]);
+                            // Clear barriers after 3 points scored against them
+                            barrierScoreCountRef.current += 1;
+                            if (barrierScoreCountRef.current >= 3) {
+                                hardBarriersRef.current = [];
+                                barrierActiveRef.current = false;
+                                barrierScoreCountRef.current = 0;
+                                setHardBarriers([]);
+                            }
                         }
                     }
 
