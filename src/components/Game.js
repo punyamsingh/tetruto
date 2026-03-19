@@ -14,7 +14,11 @@ const Game = ({ onScoreChange }) => {
         left: '40%',
         top: '40%',
     });
-    const [holeStyles,setHoleStyles] = useState(() => randomHolePosition());
+    const [holeStyles,setHoleStyles] = useState({ left: '60%', top: '60%' });
+
+    useEffect(() => {
+        setHoleStyles(randomHolePosition());
+    }, []);
 
     useEffect(() => {
         const loadingTimeout = setTimeout(() => {
