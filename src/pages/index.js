@@ -1,12 +1,13 @@
 // pages/index.js
 
-import React,{ useState } from 'react';
+import React, { useState } from 'react';
 import Head from 'next/head';
 import Game from '../components/Game';
+import styles from '../styles/Home.module.css';
 
 const Home = () => {
-  const [currentLevel,setCurrentLevel] = useState(1);
-  const [score,setScore] = useState(0);
+  const [currentLevel, setCurrentLevel] = useState(1);
+  const [score, setScore] = useState(0);
 
   const handleLevelChange = (newLevel) => {
     setCurrentLevel(newLevel);
@@ -17,15 +18,26 @@ const Home = () => {
   };
 
   return (
-    <div>
+    <div className={styles.gameWrapper}>
       <Head>
         <title>TETRUTO</title>
       </Head>
 
-      <main>
-        <h1>TETRUTO</h1>
-        <p>Level: {currentLevel}</p>
-        <p>Score: {score}</p>
+      <header className={styles.header}>
+        <h1 className={styles.title}>TETRUTO</h1>
+        <div className={styles.hud}>
+          <div className={styles.hudItem}>
+            <span className={styles.hudLabel}>Level</span>
+            <span className={styles.hudValue}>{currentLevel}</span>
+          </div>
+          <div className={styles.hudItem}>
+            <span className={styles.hudLabel}>Score</span>
+            <span className={styles.hudValue}>{score}</span>
+          </div>
+        </div>
+      </header>
+
+      <main className={styles.gameArea}>
         <Game onLevelChange={handleLevelChange} onScoreChange={handleScoreChange} />
       </main>
     </div>

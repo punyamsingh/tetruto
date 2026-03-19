@@ -6,10 +6,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    overflow: hidden;
 }
 
 .shape,
@@ -22,20 +19,30 @@
 
 .shape {
     background-color: #fff;
+    border-radius: 6px;
+    box-shadow:
+        0 0 12px rgba(255, 255, 255, 0.9),
+        0 0 30px rgba(255, 255, 255, 0.4);
 }
 
 .hole {
     width: 60px;
     height: 60px;
-    border: 3px solid #e74c3c;
-    background-color: #ffffff;
+    border: 2px solid #e74c3c;
+    background-color: transparent;
+    border-radius: 6px;
+    box-shadow:
+        0 0 12px rgba(231, 76, 60, 0.6),
+        inset 0 0 12px rgba(231, 76, 60, 0.15);
 }
 
 .additionalShape {
     width: 50px;
     height: 50px;
     background-color: #3498db;
+    border-radius: 6px;
     position: absolute;
+    box-shadow: 0 0 12px rgba(52, 152, 219, 0.7);
 }
 
 .loaderContainer {
@@ -44,6 +51,15 @@
     left: 50%;
     transform: translate(-50%, -50%);
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 1rem;
+}
+
+.loaderText {
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
 }
