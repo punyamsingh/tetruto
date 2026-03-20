@@ -7,6 +7,11 @@ const randomHolePosition = () => ({
     top: `${Math.floor(Math.random() * (window.innerHeight - 70))}px`,
 });
 
+const LEVEL_RULES = {
+    1: 'Tilt to guide the block into the red hole',
+    2: 'Your path hardens into walls — don\'t get trapped',
+};
+
 const Game = ({ onScoreChange,onLevelChange }) => {
     const [loading,setLoading] = useState(true);
     const [score,setScore] = useState(0);
@@ -18,6 +23,9 @@ const Game = ({ onScoreChange,onLevelChange }) => {
     const [level,setLevel] = useState(1);
     const [trajectoryPoints,setTrajectoryPoints] = useState([]);
     const [hardBarriers,setHardBarriers] = useState([]);
+    const [showOverlay,setShowOverlay] = useState(false);
+    const [countdown,setCountdown] = useState(3);
+    const [overlayLevel,setOverlayLevel] = useState(1);
 
     // Refs for mutable game state accessed inside event handler
     const scoreRef = useRef(0);
@@ -30,6 +38,8 @@ const Game = ({ onScoreChange,onLevelChange }) => {
     const lastTrajectoryTimeRef = useRef(0);
     const onScoreChangeRef = useRef(onScoreChange);
     const onLevelChangeRef = useRef(onLevelChange);
+    const overlayActiveRef = useRef(false);
+    const overlayTimersRef = useRef([]);
 
     useEffect(() => { onScoreChangeRef.current = onScoreChange; },[onScoreChange]);
     useEffect(() => { onLevelChangeRef.current = onLevelChange; },[onLevelChange]);
@@ -42,10 +52,12 @@ const Game = ({ onScoreChange,onLevelChange }) => {
         const loadingTimeout = setTimeout(() => {
             setLoading(false);
         },1500);
+        return () => clearTimeout(loadingTimeout);
+    },[]);
 
-        return () => {
-            clearTimeout(loadingTimeout);
-        };
+    // Cleanup overlay timers on unmount
+    useEffect(() => {
+        return () => { overlayTimersRef.current.forEach(clearTimeout); };
     },[]);
 
     // Half-size of each barrier dot used for collision bounding box
@@ -73,6 +85,55 @@ const Game = ({ onScoreChange,onLevelChange }) => {
         return false;
     };
 
+    const triggerOverlay = (lvl,spawnPos) => {
+        overlayTimersRef.current.forEach(clearTimeout);
+        overlayTimersRef.current = [];
+
+        overlayActiveRef.current = true;
+        setOverlayLevel(lvl);
+        setCountdown(3);
+        setShowOverlay(true);
+
+        // Move block off-screen above viewport (no transition)
+        setShapeStyles({ left: `${spawnPos.left}%`,top: '-8%' });
+
+        const t1 = setTimeout(() => setCountdown(2),1000);
+        const t2 = setTimeout(() => setCountdown(1),2000);
+        const t3 = setTimeout(() => {
+            setShowOverlay(false);
+            // Animate block dropping in with spring easing
+            setShapeStyles({
+                left: `${spawnPos.left}%`,
+                top: `${spawnPos.top}%`,
+                transition: 'top 0.5s cubic-bezier(0.23, 1, 0.32, 1)',
+            });
+            currentPosRef.current = spawnPos;
+            const t4 = setTimeout(() => {
+                overlayActiveRef.current = false;
+                setShapeStyles({ left: `${spawnPos.left}%`,top: `${spawnPos.top}%` });
+            },600);
+            overlayTimersRef.current = [t4];
+        },3000);
+
+        overlayTimersRef.current = [t1,t2,t3];
+    };
+
+    // Trigger level 1 overlay when loading finishes
+    useEffect(() => {
+        if (!loading) {
+            triggerOverlay(1,{ left: 40,top: 40 });
+        }
+    },[loading]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    // Trigger overlay when level advances to 2+
+    useEffect(() => {
+        if (level <= 1) return;
+        const spawnPos = safeSpawnPosition() || { left: 40,top: 40 };
+        const hole = safeHolePosition();
+        if (hole) setHoleStyles(hole);
+        triggerOverlay(level,spawnPos);
+    },[level]); // eslint-disable-line react-hooks/exhaustive-deps
+
     useEffect(() => {
         const sensitivity = 10;
         const cooldownDuration = 1000;
@@ -80,6 +141,9 @@ const Game = ({ onScoreChange,onLevelChange }) => {
         let lastAlignmentTime = 0;
 
         const updatePosition = (event) => {
+            // Pause gyro input while overlay is active
+            if (overlayActiveRef.current) return;
+
             const x = event.gamma / sensitivity;
             const y = event.beta / sensitivity;
 
@@ -124,16 +188,18 @@ const Game = ({ onScoreChange,onLevelChange }) => {
                     setScore(newScore);
                     onScoreChangeRef.current(newScore);
 
+                    let levelJustChanged = false;
+
                     // Advance to level 2 at 3 points
                     if (newScore >= 3 && levelRef.current < 2) {
+                        overlayActiveRef.current = true; // block gyro immediately
                         levelRef.current = 2;
                         setLevel(2);
+                        levelJustChanged = true;
                         if (onLevelChangeRef.current) onLevelChangeRef.current(2);
                     }
 
                     // Trajectory hardening logic (level 2 only)
-                    // Every score hardens the current trajectory into barriers;
-                    // barriers are replaced each round, never cleared
                     if (levelRef.current >= 2 && trajectoryRef.current.length > 0) {
                         hardBarriersRef.current = [...trajectoryRef.current];
                         barrierActiveRef.current = true;
@@ -149,7 +215,10 @@ const Game = ({ onScoreChange,onLevelChange }) => {
                         document.body.style.backgroundColor = '';
                     },500);
 
-                    resetGame();
+                    // Let the level useEffect handle reset on level-up
+                    if (!levelJustChanged) {
+                        resetGame();
+                    }
                     lastAlignmentTime = currentTime;
                 }
             }
@@ -257,6 +326,14 @@ const Game = ({ onScoreChange,onLevelChange }) => {
                 </div>
             ) : (
                 <>
+                    {showOverlay && (
+                        <div className={styles.levelOverlay}>
+                            <div className={styles.overlayLevelLabel}>Level {overlayLevel}</div>
+                            <div className={styles.overlayRule}>{LEVEL_RULES[overlayLevel]}</div>
+                            <div className={styles.overlayCountdown} key={countdown}>{countdown}</div>
+                        </div>
+                    )}
+
                     {/* Trajectory trail: soft blue dots showing where block has been */}
                     {trajectoryPoints.map((pt,i) => (
                         <div
