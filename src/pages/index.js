@@ -1,6 +1,6 @@
 // pages/index.js
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Game from '../components/Game';
 import styles from '../styles/Home.module.css';
@@ -8,6 +8,18 @@ import styles from '../styles/Home.module.css';
 const Home = () => {
   const [currentLevel, setCurrentLevel] = useState(1);
   const [score, setScore] = useState(0);
+  const [highScore, setHighScore] = useState(0);
+
+  // Seed high score from localStorage on first render
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('tetruto_high_score');
+      if (saved !== null) {
+        const val = parseInt(saved, 10);
+        if (!isNaN(val) && val > 0) setHighScore(val);
+      }
+    } catch (e) {}
+  }, []);
 
   const handleLevelChange = (newLevel) => {
     setCurrentLevel(newLevel);
@@ -15,6 +27,10 @@ const Home = () => {
 
   const handleScoreChange = (newScore) => {
     setScore(newScore);
+  };
+
+  const handleHighScoreChange = (newHigh) => {
+    setHighScore(newHigh);
   };
 
   return (
@@ -33,10 +49,17 @@ const Home = () => {
         <div className={styles.hudStats}>
           <span className={styles.hudStat}>LVL <strong>{currentLevel}</strong></span>
           <span className={styles.hudStat}>SCORE <strong>{score}</strong></span>
+          {highScore > 0 && (
+            <span className={styles.hudStat}>BEST <strong>{highScore}</strong></span>
+          )}
         </div>
       </div>
 
-      <Game onLevelChange={handleLevelChange} onScoreChange={handleScoreChange} />
+      <Game
+        onLevelChange={handleLevelChange}
+        onScoreChange={handleScoreChange}
+        onHighScoreChange={handleHighScoreChange}
+      />
     </div>
   );
 };
