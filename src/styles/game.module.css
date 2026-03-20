@@ -72,6 +72,63 @@
         0 0 2px rgba(231, 76, 60, 1);
 }
 
+/* Level-start overlay */
+.levelOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 10, 20, 0.88);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    animation: overlayFadeIn 0.35s ease-out;
+}
+
+.overlayLevelLabel {
+    font-size: 0.6rem;
+    letter-spacing: 0.45em;
+    color: rgba(52, 152, 219, 0.85);
+    text-transform: uppercase;
+}
+
+.overlayRule {
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    text-align: center;
+    padding: 0 2.5rem;
+    line-height: 1.7;
+}
+
+.overlayCountdown {
+    font-size: 9rem;
+    font-weight: 900;
+    line-height: 1;
+    color: #fff;
+    text-shadow:
+        0 0 25px rgba(255, 255, 255, 0.7),
+        0 0 70px rgba(52, 152, 219, 0.55),
+        0 0 140px rgba(52, 152, 219, 0.25);
+    animation: countdownPop 0.85s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+@keyframes overlayFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes countdownPop {
+    0%   { transform: scale(1.9); opacity: 0; }
+    18%  { opacity: 1; }
+    60%  { transform: scale(1); opacity: 1; }
+    100% { transform: scale(0.88); opacity: 0.45; }
+}
+
 .loaderContainer {
     position: fixed;
     top: 50%;
