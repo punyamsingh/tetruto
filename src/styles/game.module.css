@@ -72,6 +72,21 @@
         0 0 2px rgba(231, 76, 60, 1);
 }
 
+.mine {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background: radial-gradient(circle at 38% 32%, #ffe066, #e67e22 55%, #922b21);
+    border-radius: 50%;
+    z-index: 8;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    box-shadow:
+        0 0 10px rgba(230, 126, 34, 0.9),
+        0 0 28px rgba(146, 43, 33, 0.55),
+        inset 0 -4px 6px rgba(0, 0, 0, 0.4);
+}
+
 /* Level-start overlay */
 .levelOverlay {
     position: fixed;
