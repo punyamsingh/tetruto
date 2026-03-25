@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback, forwardRef, useImperativeHandle } from 'react';
 import { BeatLoader } from 'react-spinners';
 import styles from '../styles/game.module.css';
 import { useGameState } from '../hooks/useGameState';
@@ -20,7 +20,7 @@ const randomHolePosition = () => ({
     top: `${Math.floor(Math.random() * (window.innerHeight - HOLE_SIZE - 5))}px`,
 });
 
-const Game = ({ onScoreChange, onLevelChange, onHighScoreChange, onGameOver }) => {
+const Game = forwardRef(({ onScoreChange, onLevelChange, onHighScoreChange, onGameOver, onGameStateChange }, ref) => {
     const {
         loading, setLoading,
         score, setScore,
@@ -49,10 +49,18 @@ const Game = ({ onScoreChange, onLevelChange, onHighScoreChange, onGameOver }) =
     const onLevelChangeRef = useRef(onLevelChange);
     const onHighScoreChangeRef = useRef(onHighScoreChange);
     const onGameOverRef = useRef(onGameOver);
+    const onGameStateChangeRef = useRef(onGameStateChange);
     useEffect(() => { onScoreChangeRef.current = onScoreChange; }, [onScoreChange]);
     useEffect(() => { onLevelChangeRef.current = onLevelChange; }, [onLevelChange]);
     useEffect(() => { onHighScoreChangeRef.current = onHighScoreChange; }, [onHighScoreChange]);
     useEffect(() => { onGameOverRef.current = onGameOver; }, [onGameOver]);
+    useEffect(() => { onGameStateChangeRef.current = onGameStateChange; }, [onGameStateChange]);
+
+    const updateGameState = (newState) => {
+        gameStateRef.current = newState;
+        setGameState(newState);
+        if (onGameStateChangeRef.current) onGameStateChangeRef.current(newState);
+    };
 
     // Report loaded high score to parent
     useEffect(() => {
@@ -175,7 +183,7 @@ const Game = ({ onScoreChange, onLevelChange, onHighScoreChange, onGameOver }) =
         }
     };
 
-    // --- Mine blast → game over screen ---
+    // --- Mine blast -> game over screen ---
     const handleMineBlast = () => {
         const currentScore = scoreRef.current;
         if (currentScore > highScoreRef.current) {
@@ -187,8 +195,7 @@ const Game = ({ onScoreChange, onLevelChange, onHighScoreChange, onGameOver }) =
         document.body.style.backgroundColor = '#FF1100';
         setTimeout(() => { document.body.style.backgroundColor = ''; }, BLAST_FLASH_DURATION);
         setFinalScore(currentScore);
-        gameStateRef.current = GAME_STATE.GAME_OVER;
-        setGameState(GAME_STATE.GAME_OVER);
+        updateGameState(GAME_STATE.GAME_OVER);
         if (onGameOverRef.current) onGameOverRef.current(currentScore);
     };
 
@@ -212,20 +219,33 @@ const Game = ({ onScoreChange, onLevelChange, onHighScoreChange, onGameOver }) =
         const hole = randomHolePosition();
         setHoleStyles(hole);
         holeStylesRef.current = hole;
-        gameStateRef.current = GAME_STATE.PLAYING;
-        setGameState(GAME_STATE.PLAYING);
+        updateGameState(GAME_STATE.PLAYING);
         triggerOverlay(1, { left: 40, top: 40 });
     };
 
     const pauseGame = () => {
-        gameStateRef.current = GAME_STATE.PAUSED;
-        setGameState(GAME_STATE.PAUSED);
+        updateGameState(GAME_STATE.PAUSED);
     };
 
     const resumeGame = () => {
-        gameStateRef.current = GAME_STATE.PLAYING;
-        setGameState(GAME_STATE.PLAYING);
+        updateGameState(GAME_STATE.PLAYING);
     };
+
+    const toggleMute = () => {
+        const next = !soundMuted;
+        setSoundMuted(next);
+        setMuted(next);
+        return next;
+    };
+
+    // Expose controls to parent via ref
+    useImperativeHandle(ref, () => ({
+        pause: pauseGame,
+        resume: resumeGame,
+        restart: restartGame,
+        toggleMute,
+        isMuted: () => soundMuted,
+    }));
 
     // --- Scoring/trajectory/mine logic called on every position update ---
     const lastAlignmentTimeRef = useRef(0);
@@ -396,20 +416,12 @@ const Game = ({ onScoreChange, onLevelChange, onHighScoreChange, onGameOver }) =
                         </div>
                     )}
 
-                    {gameState === GAME_STATE.PLAYING && !showOverlay && (
-                        <button className={styles.pauseButton} onClick={pauseGame} aria-label="Pause game">&#x23F8;</button>
-                    )}
-
                     {/* Pause Menu */}
                     {gameState === GAME_STATE.PAUSED && (
                         <div className={styles.menuOverlay}>
                             <div className={styles.menuTitle}>PAUSED</div>
                             <button className={styles.menuButton} onClick={resumeGame}>Resume</button>
-                            <button className={styles.menuButton} onClick={() => {
-                                const next = !soundMuted;
-                                setSoundMuted(next);
-                                setMuted(next);
-                            }}>Sound: {soundMuted ? 'OFF' : 'ON'}</button>
+                            <button className={styles.menuButton} onClick={toggleMute}>Sound: {soundMuted ? 'OFF' : 'ON'}</button>
                             <button className={styles.menuButton} onClick={restartGame}>Restart</button>
                         </div>
                     )}
@@ -457,6 +469,8 @@ const Game = ({ onScoreChange, onLevelChange, onHighScoreChange, onGameOver }) =
             )}
         </div>
     );
-};
+});
+
+Game.displayName = 'Game';
 
 export default Game;

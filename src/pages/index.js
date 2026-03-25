@@ -1,20 +1,46 @@
 // pages/index.js
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Head from 'next/head';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import Game from '../components/Game';
 import Leaderboard from '../components/Leaderboard';
 import styles from '../styles/Home.module.css';
+import { GAME_STATE } from '../constants';
+
+// SVG icons — clean, monochrome, 16x16 viewBox
+const PauseIcon = () => (
+  <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <rect x="3" y="2" width="3.5" height="12" rx="1" fill="currentColor" />
+    <rect x="9.5" y="2" width="3.5" height="12" rx="1" fill="currentColor" />
+  </svg>
+);
+
+const TrophyIcon = () => (
+  <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path d="M4 2h8v5a4 4 0 01-8 0V2z" fill="currentColor" opacity="0.9" />
+    <path d="M4 4H2a2 2 0 000 4h0.5A4.5 4.5 0 004 4zM12 4h2a2 2 0 010 4h-0.5A4.5 4.5 0 0012 4z" fill="currentColor" opacity="0.5" />
+    <rect x="6.5" y="10" width="3" height="2.5" rx="0.5" fill="currentColor" />
+    <rect x="4.5" y="12" width="7" height="2" rx="1" fill="currentColor" opacity="0.7" />
+  </svg>
+);
+
+const UserIcon = () => (
+  <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="8" cy="5" r="3" fill="currentColor" />
+    <path d="M2.5 14a5.5 5.5 0 0111 0z" fill="currentColor" opacity="0.7" />
+  </svg>
+);
 
 const Home = () => {
   const { data: session } = useSession();
+  const gameRef = useRef(null);
   const [currentLevel, setCurrentLevel] = useState(1);
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [gameState, setGameState] = useState(GAME_STATE.PLAYING);
 
-  // Seed high score from localStorage on first render
   useEffect(() => {
     try {
       const saved = localStorage.getItem('tetruto_high_score');
@@ -25,27 +51,23 @@ const Home = () => {
     } catch (e) {}
   }, []);
 
-  const handleLevelChange = (newLevel) => {
-    setCurrentLevel(newLevel);
-  };
-
-  const handleScoreChange = (newScore) => {
-    setScore(newScore);
-  };
-
-  const handleHighScoreChange = (newHigh) => {
-    setHighScore(newHigh);
-  };
-
   const handleGameOver = useCallback((finalScore) => {
     if (session && finalScore > 0) {
       fetch('/api/leaderboard', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ score: finalScore }),
-      }).catch(() => {}); // fire and forget
+      }).catch(() => {});
     }
   }, [session]);
+
+  const handlePause = () => {
+    if (gameState === GAME_STATE.PLAYING) {
+      gameRef.current?.pause();
+    } else if (gameState === GAME_STATE.PAUSED) {
+      gameRef.current?.resume();
+    }
+  };
 
   return (
     <div className={styles.gameWrapper}>
@@ -58,41 +80,63 @@ const Home = () => {
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </Head>
 
-      <div className={styles.hud}>
-        <span className={styles.title}>TETRUTO</span>
-        <div className={styles.hudStats} aria-live="polite">
-          <span className={styles.hudStat}>LVL <strong>{currentLevel}</strong></span>
-          <span className={styles.hudStat}>SCORE <strong>{score}</strong></span>
-          {highScore > 0 && (
-            <span className={styles.hudStat}>BEST <strong>{highScore}</strong></span>
+      {/* ── Top Bar ── */}
+      <div className={styles.topBar}>
+        <div className={styles.topBarLeft}>
+          <span className={styles.title}>TETRUTO</span>
+          <div className={styles.hudStats} aria-live="polite">
+            <span className={styles.hudStat}>LVL <strong>{currentLevel}</strong></span>
+            <span className={styles.hudStat}>SCORE <strong>{score}</strong></span>
+            {highScore > 0 && (
+              <span className={styles.hudStat}>BEST <strong>{highScore}</strong></span>
+            )}
+          </div>
+        </div>
+
+        <div className={styles.topBarRight}>
+          {session ? (
+            <button className={styles.userBtn} onClick={() => signOut()} aria-label="Sign out">
+              {session.user.image ? (
+                <img src={session.user.image} alt="" className={styles.userAvatar} referrerPolicy="no-referrer" />
+              ) : (
+                <UserIcon />
+              )}
+              <span>{session.user.name?.split(' ')[0]}</span>
+            </button>
+          ) : (
+            <button className={styles.userBtn} onClick={() => signIn('google')} aria-label="Sign in with Google">
+              <UserIcon />
+              <span>Sign in</span>
+            </button>
           )}
+
+          <div className={styles.divider} />
+
+          <button className={styles.iconBtn} onClick={() => setShowLeaderboard(true)} aria-label="Leaderboard">
+            <TrophyIcon />
+          </button>
+
+          <button
+            className={styles.iconBtn}
+            onClick={handlePause}
+            aria-label={gameState === GAME_STATE.PAUSED ? 'Resume game' : 'Pause game'}
+          >
+            <PauseIcon />
+          </button>
         </div>
       </div>
 
-      <div className={styles.hudLeft}>
-        {session ? (
-          <button className={styles.authButton} onClick={() => signOut()}>
-            {session.user.image && (
-              <img src={session.user.image} alt="" className={styles.authAvatar} referrerPolicy="no-referrer" />
-            )}
-            <span>{session.user.name?.split(' ')[0]}</span>
-          </button>
-        ) : (
-          <button className={styles.authButton} onClick={() => signIn('google')}>
-            Sign in
-          </button>
-        )}
-        <button className={styles.authButton} onClick={() => setShowLeaderboard(true)}>
-          Top 10
-        </button>
+      {/* ── Game Area ── */}
+      <div className={styles.gameArea}>
+        <Game
+          ref={gameRef}
+          onLevelChange={setCurrentLevel}
+          onScoreChange={setScore}
+          onHighScoreChange={setHighScore}
+          onGameOver={handleGameOver}
+          onGameStateChange={setGameState}
+        />
       </div>
-
-      <Game
-        onLevelChange={handleLevelChange}
-        onScoreChange={handleScoreChange}
-        onHighScoreChange={handleHighScoreChange}
-        onGameOver={handleGameOver}
-      />
 
       <Leaderboard
         visible={showLeaderboard}
