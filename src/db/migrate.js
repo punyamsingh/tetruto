@@ -46,7 +46,7 @@ async function migrate() {
     CREATE TABLE IF NOT EXISTS scores (
       id SERIAL PRIMARY KEY,
       user_id TEXT NOT NULL REFERENCES users(id),
-      score INTEGER NOT NULL,
+      score INTEGER NOT NULL CHECK (score >= 0),
       created_at TIMESTAMP DEFAULT NOW() NOT NULL
     )
   `;
@@ -58,4 +58,7 @@ async function migrate() {
   console.log('Migration complete.');
 }
 
-migrate().catch(console.error);
+migrate().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

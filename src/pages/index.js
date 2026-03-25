@@ -57,7 +57,13 @@ const Home = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ score: finalScore }),
-      }).catch(() => {});
+      })
+        .then((r) => {
+          if (!r.ok) {
+            r.text().then((body) => console.error('Score submit failed:', r.status, body));
+          }
+        })
+        .catch((err) => console.error('Score submit error:', err));
     }
   }, [session]);
 
