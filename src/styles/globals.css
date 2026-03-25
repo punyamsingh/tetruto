@@ -48,3 +48,12 @@ a {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Accessibility: High contrast */
+@media (prefers-contrast: more) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}

@@ -58,6 +58,7 @@
     z-index: 5;
     transform: translate(-50%, -50%);
     pointer-events: none;
+    will-change: transform;
 }
 
 .hardBarrier {
@@ -72,6 +73,7 @@
     box-shadow:
         0 0 4px rgba(231, 76, 60, 0.7),
         0 0 1px rgba(231, 76, 60, 1);
+    will-change: transform;
 }
 
 .mine {
@@ -87,6 +89,7 @@
         0 0 5px rgba(230, 126, 34, 0.9),
         0 0 14px rgba(146, 43, 33, 0.55),
         inset 0 -2px 3px rgba(0, 0, 0, 0.4);
+    will-change: transform;
 }
 
 .mine::after {
@@ -236,4 +239,21 @@
     padding: 0.75rem 2.5rem;
     cursor: pointer;
     text-transform: uppercase;
+}
+
+/* Accessibility: Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .levelOverlay {
+        animation: none;
+    }
+
+    .overlayCountdown {
+        animation: none;
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    .shape {
+        transition: none !important;
+    }
 }

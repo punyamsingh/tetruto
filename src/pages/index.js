@@ -36,7 +36,7 @@ const Home = () => {
   return (
     <div className={styles.gameWrapper}>
       <Head>
-        <title>TETRUTO</title>
+        <title>TETRUTO - Motion Control Game</title>
         <link rel="icon" type="image/svg+xml" href="/logo-icon.svg" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
         <meta name="mobile-web-app-capable" content="yes" />
