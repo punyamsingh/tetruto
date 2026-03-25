@@ -101,18 +101,16 @@ const Home = () => {
 
         <div className={styles.topBarRight}>
           {session ? (
-            <button className={styles.userBtn} onClick={() => signOut()} aria-label="Sign out">
+            <button className={styles.userBtn} onClick={() => signOut()} aria-label={`Signed in as ${session.user.name}. Click to sign out`}>
               {session.user.image ? (
                 <img src={session.user.image} alt="" className={styles.userAvatar} referrerPolicy="no-referrer" />
               ) : (
                 <UserIcon />
               )}
-              <span>{session.user.name?.split(' ')[0]}</span>
             </button>
           ) : (
             <button className={styles.userBtn} onClick={() => signIn('google')} aria-label="Sign in with Google">
               <UserIcon />
-              <span>Sign in</span>
             </button>
           )}
 
