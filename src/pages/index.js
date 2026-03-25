@@ -1,14 +1,18 @@
 // pages/index.js
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Head from 'next/head';
+import { useSession, signIn, signOut } from 'next-auth/react';
 import Game from '../components/Game';
+import Leaderboard from '../components/Leaderboard';
 import styles from '../styles/Home.module.css';
 
 const Home = () => {
+  const { data: session } = useSession();
   const [currentLevel, setCurrentLevel] = useState(1);
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   // Seed high score from localStorage on first render
   useEffect(() => {
@@ -33,6 +37,16 @@ const Home = () => {
     setHighScore(newHigh);
   };
 
+  const handleGameOver = useCallback((finalScore) => {
+    if (session && finalScore > 0) {
+      fetch('/api/leaderboard', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ score: finalScore }),
+      }).catch(() => {}); // fire and forget
+    }
+  }, [session]);
+
   return (
     <div className={styles.gameWrapper}>
       <Head>
@@ -55,10 +69,34 @@ const Home = () => {
         </div>
       </div>
 
+      <div className={styles.hudLeft}>
+        {session ? (
+          <button className={styles.authButton} onClick={() => signOut()}>
+            {session.user.image && (
+              <img src={session.user.image} alt="" className={styles.authAvatar} referrerPolicy="no-referrer" />
+            )}
+            <span>{session.user.name?.split(' ')[0]}</span>
+          </button>
+        ) : (
+          <button className={styles.authButton} onClick={() => signIn('google')}>
+            Sign in
+          </button>
+        )}
+        <button className={styles.authButton} onClick={() => setShowLeaderboard(true)}>
+          Top 10
+        </button>
+      </div>
+
       <Game
         onLevelChange={handleLevelChange}
         onScoreChange={handleScoreChange}
         onHighScoreChange={handleHighScoreChange}
+        onGameOver={handleGameOver}
+      />
+
+      <Leaderboard
+        visible={showLeaderboard}
+        onClose={() => setShowLeaderboard(false)}
       />
     </div>
   );

@@ -20,7 +20,7 @@ const randomHolePosition = () => ({
     top: `${Math.floor(Math.random() * (window.innerHeight - HOLE_SIZE - 5))}px`,
 });
 
-const Game = ({ onScoreChange, onLevelChange, onHighScoreChange }) => {
+const Game = ({ onScoreChange, onLevelChange, onHighScoreChange, onGameOver }) => {
     const {
         loading, setLoading,
         score, setScore,
@@ -48,9 +48,11 @@ const Game = ({ onScoreChange, onLevelChange, onHighScoreChange }) => {
     const onScoreChangeRef = useRef(onScoreChange);
     const onLevelChangeRef = useRef(onLevelChange);
     const onHighScoreChangeRef = useRef(onHighScoreChange);
+    const onGameOverRef = useRef(onGameOver);
     useEffect(() => { onScoreChangeRef.current = onScoreChange; }, [onScoreChange]);
     useEffect(() => { onLevelChangeRef.current = onLevelChange; }, [onLevelChange]);
     useEffect(() => { onHighScoreChangeRef.current = onHighScoreChange; }, [onHighScoreChange]);
+    useEffect(() => { onGameOverRef.current = onGameOver; }, [onGameOver]);
 
     // Report loaded high score to parent
     useEffect(() => {
@@ -187,6 +189,7 @@ const Game = ({ onScoreChange, onLevelChange, onHighScoreChange }) => {
         setFinalScore(currentScore);
         gameStateRef.current = GAME_STATE.GAME_OVER;
         setGameState(GAME_STATE.GAME_OVER);
+        if (onGameOverRef.current) onGameOverRef.current(currentScore);
     };
 
     // --- Full restart ---
