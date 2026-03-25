@@ -46,7 +46,7 @@ const Home = () => {
 
       <div className={styles.hud}>
         <span className={styles.title}>TETRUTO</span>
-        <div className={styles.hudStats}>
+        <div className={styles.hudStats} aria-live="polite">
           <span className={styles.hudStat}>LVL <strong>{currentLevel}</strong></span>
           <span className={styles.hudStat}>SCORE <strong>{score}</strong></span>
           {highScore > 0 && (
