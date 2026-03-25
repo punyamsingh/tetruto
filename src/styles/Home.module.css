@@ -13,43 +13,46 @@
 /* ── Top bar ── */
 .topBar {
   flex-shrink: 0;
-  height: 48px;
   display: flex;
-  align-items: center;
-  padding: 0 0.75rem;
+  flex-direction: column;
   background: rgba(255, 255, 255, 0.025);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   z-index: 100;
-  gap: 0.5rem;
 }
 
-.topBarLeft {
+/* Row 1: title + action buttons */
+.topBarRow1 {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  min-width: 0;
-  flex: 1;
-  overflow: hidden;
+  justify-content: space-between;
+  height: 42px;
+  padding: 0 0.75rem;
 }
 
 .title {
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   font-weight: 800;
-  letter-spacing: 0.25em;
-  color: rgba(255, 255, 255, 0.2);
-  flex-shrink: 0;
+  letter-spacing: 0.3em;
+  color: rgba(255, 255, 255, 0.25);
 }
 
-.hudStats {
+.topBarActions {
   display: flex;
-  gap: 0.6rem;
-  min-width: 0;
-  overflow: hidden;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Row 2: stats */
+.topBarRow2 {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 0 0.75rem 0.5rem;
 }
 
 .hudStat {
   font-size: 0.6rem;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.1em;
   color: rgba(255, 255, 255, 0.25);
   white-space: nowrap;
 }
@@ -57,13 +60,6 @@
 .hudStat strong {
   color: rgba(255, 255, 255, 0.6);
   font-weight: 700;
-}
-
-.topBarRight {
-  display: flex;
-  align-items: center;
-  gap: 0.125rem;
-  flex-shrink: 0;
 }
 
 /* ── Icon buttons (shared) ── */
@@ -128,11 +124,4 @@
   flex: 1;
   position: relative;
   overflow: hidden;
-}
-
-/* ── Mobile: hide title on very narrow screens ── */
-@media (max-width: 360px) {
-  .title {
-    display: none;
-  }
 }
