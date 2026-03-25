@@ -16,13 +16,13 @@ export const authOptions = {
       if (account.provider === 'google') {
         await db.insert(users).values({
           id: user.id,
-          name: user.name,
-          image: user.image,
+          name: user.name ?? 'Unknown',
+          image: user.image ?? null,
         }).onConflictDoUpdate({
           target: users.id,
           set: {
-            name: user.name,
-            image: user.image,
+            name: user.name ?? 'Unknown',
+            image: user.image ?? null,
           },
         });
       }

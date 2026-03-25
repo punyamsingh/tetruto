@@ -1,4 +1,5 @@
-import { pgTable, text, integer, timestamp, serial } from 'drizzle-orm/pg-core';
+import { pgTable, text, integer, timestamp, serial, check } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
 
 export const users = pgTable('users', {
   id: text('id').primaryKey(), // Google OAuth sub
@@ -11,4 +12,6 @@ export const scores = pgTable('scores', {
   userId: text('user_id').notNull().references(() => users.id),
   score: integer('score').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
-});
+}, (table) => [
+  check('scores_score_non_negative', sql`${table.score} >= 0`),
+]);

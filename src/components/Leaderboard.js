@@ -9,8 +9,13 @@ const Leaderboard = ({ visible, onClose }) => {
     if (!visible) return;
     setLoading(true);
     fetch('/api/leaderboard')
-      .then((r) => r.json())
-      .then((data) => setScores(data))
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then((data) => {
+        setScores(Array.isArray(data) ? data : []);
+      })
       .catch(() => setScores([]))
       .finally(() => setLoading(false));
   }, [visible]);
@@ -22,7 +27,7 @@ const Leaderboard = ({ visible, onClose }) => {
       <div className={styles.panel}>
         <div className={styles.header}>
           <span className={styles.title}>LEADERBOARD</span>
-          <button className={styles.closeBtn} onClick={onClose}>&times;</button>
+          <button className={styles.closeBtn} onClick={onClose} aria-label="Close">&times;</button>
         </div>
 
         {loading ? (
