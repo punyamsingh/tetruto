@@ -8,7 +8,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: fadeIn 0.25s ease-out;
+  animation: fade-in 0.25s ease-out;
 }
 
 .panel {
@@ -36,10 +36,17 @@
 .closeBtn {
   background: none;
   border: none;
+  border-radius: 4px;
   color: rgba(255, 255, 255, 0.5);
   font-size: 1.5rem;
   cursor: pointer;
   line-height: 1;
+}
+
+.closeBtn:focus-visible {
+  outline: 2px solid rgba(52, 152, 219, 0.9);
+  outline-offset: 2px;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .loading,
@@ -114,7 +121,7 @@
   letter-spacing: 0.05em;
 }
 
-@keyframes fadeIn {
+@keyframes fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
 }

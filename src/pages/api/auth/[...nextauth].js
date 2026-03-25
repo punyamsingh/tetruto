@@ -14,19 +14,17 @@ export const authOptions = {
   callbacks: {
     async signIn({ user, account }) {
       if (account.provider === 'google') {
-        const existing = await db.select().from(users).where(eq(users.id, user.id));
-        if (existing.length === 0) {
-          await db.insert(users).values({
-            id: user.id,
+        await db.insert(users).values({
+          id: user.id,
+          name: user.name,
+          image: user.image,
+        }).onConflictDoUpdate({
+          target: users.id,
+          set: {
             name: user.name,
             image: user.image,
-          });
-        } else {
-          await db.update(users).set({
-            name: user.name,
-            image: user.image,
-          }).where(eq(users.id, user.id));
-        }
+          },
+        });
       }
       return true;
     },
