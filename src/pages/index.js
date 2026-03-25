@@ -88,45 +88,41 @@ const Home = () => {
 
       {/* ── Top Bar ── */}
       <div className={styles.topBar}>
-        <div className={styles.topBarLeft}>
+        <div className={styles.topBarRow1}>
           <span className={styles.title}>TETRUTO</span>
-          <div className={styles.hudStats} aria-live="polite">
-            <span className={styles.hudStat}>LVL <strong>{currentLevel}</strong></span>
-            <span className={styles.hudStat}>SCORE <strong>{score}</strong></span>
-            {highScore > 0 && (
-              <span className={styles.hudStat}>BEST <strong>{highScore}</strong></span>
+          <div className={styles.topBarActions}>
+            {session ? (
+              <button className={styles.userBtn} onClick={() => signOut()} aria-label={`Signed in as ${session.user.name}. Click to sign out`}>
+                {session.user.image ? (
+                  <img src={session.user.image} alt="" className={styles.userAvatar} referrerPolicy="no-referrer" />
+                ) : (
+                  <UserIcon />
+                )}
+              </button>
+            ) : (
+              <button className={styles.userBtn} onClick={() => signIn('google')} aria-label="Sign in with Google">
+                <UserIcon />
+              </button>
             )}
+            <div className={styles.divider} />
+            <button className={styles.iconBtn} onClick={() => setShowLeaderboard(true)} aria-label="Leaderboard">
+              <TrophyIcon />
+            </button>
+            <button
+              className={styles.iconBtn}
+              onClick={handlePause}
+              aria-label={gameState === GAME_STATE.PAUSED ? 'Resume game' : 'Pause game'}
+            >
+              <PauseIcon />
+            </button>
           </div>
         </div>
-
-        <div className={styles.topBarRight}>
-          {session ? (
-            <button className={styles.userBtn} onClick={() => signOut()} aria-label={`Signed in as ${session.user.name}. Click to sign out`}>
-              {session.user.image ? (
-                <img src={session.user.image} alt="" className={styles.userAvatar} referrerPolicy="no-referrer" />
-              ) : (
-                <UserIcon />
-              )}
-            </button>
-          ) : (
-            <button className={styles.userBtn} onClick={() => signIn('google')} aria-label="Sign in with Google">
-              <UserIcon />
-            </button>
+        <div className={styles.topBarRow2} aria-live="polite">
+          <span className={styles.hudStat}>LVL <strong>{currentLevel}</strong></span>
+          <span className={styles.hudStat}>SCORE <strong>{score}</strong></span>
+          {highScore > 0 && (
+            <span className={styles.hudStat}>BEST <strong>{highScore}</strong></span>
           )}
-
-          <div className={styles.divider} />
-
-          <button className={styles.iconBtn} onClick={() => setShowLeaderboard(true)} aria-label="Leaderboard">
-            <TrophyIcon />
-          </button>
-
-          <button
-            className={styles.iconBtn}
-            onClick={handlePause}
-            aria-label={gameState === GAME_STATE.PAUSED ? 'Resume game' : 'Pause game'}
-          >
-            <PauseIcon />
-          </button>
         </div>
       </div>
 
