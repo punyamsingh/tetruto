@@ -125,3 +125,45 @@
   position: relative;
   overflow: hidden;
 }
+
+/* ── Desktop blocker ── */
+.desktopBlocker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 2rem;
+  text-align: center;
+  gap: 1rem;
+}
+
+.blockerIcon {
+  font-size: 4rem;
+  margin-bottom: 0.5rem;
+}
+
+.blockerTitle {
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: 0.3em;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0;
+}
+
+.blockerText {
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1.6;
+  max-width: 340px;
+  margin: 0;
+}
+
+.blockerHint {
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  color: rgba(52, 152, 219, 0.7);
+  text-transform: uppercase;
+  margin: 0;
+}
