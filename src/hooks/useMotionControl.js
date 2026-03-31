@@ -12,6 +12,7 @@ import { wouldCollideWithBarriers } from '../utils/collision';
  * @param {React.RefObject} params.gameStateRef - Current game state ref
  * @param {React.RefObject} params.barrierActiveRef - Whether barriers are active
  * @param {React.RefObject} params.hardBarriersRef - Array of barrier positions
+ * @param {Function} params.getContainerDims - Returns {w, h} of game container
  * @param {Function} params.setShapeStyles - State setter for block CSS styles
  * @param {Function} params.onMove - Callback(newLeft, newTop) for game logic (scoring, trajectory, mines)
  */
@@ -21,6 +22,7 @@ export const useMotionControl = ({
     gameStateRef,
     barrierActiveRef,
     hardBarriersRef,
+    getContainerDims,
     setShapeStyles,
     onMove,
 }) => {
@@ -61,8 +63,9 @@ export const useMotionControl = ({
             // Sliding collision against hardened barriers (level 2+)
             if (barrierActiveRef.current) {
                 const barriers = hardBarriersRef.current;
-                const W = window.innerWidth;
-                const H = window.innerHeight;
+                const dims = getContainerDims();
+                const W = dims.w || window.innerWidth;
+                const H = dims.h || window.innerHeight;
                 if (wouldCollideWithBarriers(newLeft, prev.top, barriers, W, H)) newLeft = prev.left;
                 if (wouldCollideWithBarriers(prev.left, newTop, barriers, W, H)) newTop = prev.top;
                 if (wouldCollideWithBarriers(newLeft, newTop, barriers, W, H)) {

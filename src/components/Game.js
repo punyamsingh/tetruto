@@ -15,9 +15,9 @@ import {
     GAME_STATE,
 } from '../constants';
 
-const randomHolePosition = () => ({
-    left: `${Math.floor(Math.random() * (window.innerWidth - HOLE_SIZE - 5))}px`,
-    top: `${Math.floor(Math.random() * (window.innerHeight - HOLE_SIZE - 5))}px`,
+const randomHolePosition = (w, h) => ({
+    left: `${Math.floor(Math.random() * (w - HOLE_SIZE - 5))}px`,
+    top: `${Math.floor(Math.random() * (h - HOLE_SIZE - 5))}px`,
 });
 
 const Game = forwardRef(({ onScoreChange, onLevelChange, onHighScoreChange, onGameOver, onGameStateChange }, ref) => {
@@ -44,6 +44,18 @@ const Game = forwardRef(({ onScoreChange, onLevelChange, onHighScoreChange, onGa
         gameStateRef,
     } = useGameState();
 
+    // Container ref for accurate dimensions (game area != window)
+    const containerRef = useRef(null);
+    const containerDimsRef = useRef({ w: 0, h: 0 });
+
+    const getContainerDims = () => {
+        const el = containerRef.current;
+        if (el) {
+            containerDimsRef.current = { w: el.clientWidth, h: el.clientHeight };
+        }
+        return containerDimsRef.current;
+    };
+
     // Keep callback refs in sync
     const onScoreChangeRef = useRef(onScoreChange);
     const onLevelChangeRef = useRef(onLevelChange);
@@ -69,11 +81,18 @@ const Game = forwardRef(({ onScoreChange, onLevelChange, onHighScoreChange, onGa
         }
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // Set initial hole position
+    // Set initial hole position + measure container
     useEffect(() => {
-        const pos = randomHolePosition();
+        const dims = getContainerDims();
+        const w = dims.w || window.innerWidth;
+        const h = dims.h || window.innerHeight;
+        const pos = randomHolePosition(w, h);
         setHoleStyles(pos);
         holeStylesRef.current = pos;
+
+        const onResize = () => getContainerDims();
+        window.addEventListener('resize', onResize);
+        return () => window.removeEventListener('resize', onResize);
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Loading timer
@@ -89,9 +108,10 @@ const Game = forwardRef(({ onScoreChange, onLevelChange, onHighScoreChange, onGa
 
     // --- Ref-based overlap calculation (no DOM queries) ---
     const getOverlapPercentage = () => {
+        const dims = getContainerDims();
         return calculateOverlapPercentage(
             currentPosRef.current, holeStylesRef.current,
-            window.innerWidth, window.innerHeight
+            dims.w || window.innerWidth, dims.h || window.innerHeight
         );
     };
 
@@ -136,8 +156,9 @@ const Game = forwardRef(({ onScoreChange, onLevelChange, onHighScoreChange, onGa
 
     // --- Safe positioning ---
     const safeSpawnPosition = () => {
-        const W = window.innerWidth;
-        const H = window.innerHeight;
+        const dims = getContainerDims();
+        const W = dims.w || window.innerWidth;
+        const H = dims.h || window.innerHeight;
         const candidates = [{ left: 40, top: 40 }];
         for (let i = 0; i < 50; i++) {
             candidates.push({ left: 5 + Math.random() * 85, top: 5 + Math.random() * 85 });
@@ -150,9 +171,12 @@ const Game = forwardRef(({ onScoreChange, onLevelChange, onHighScoreChange, onGa
     };
 
     const safeHolePosition = () => {
+        const dims = getContainerDims();
+        const W = dims.w || window.innerWidth;
+        const H = dims.h || window.innerHeight;
         for (let i = 0; i < 50; i++) {
-            const left = Math.floor(Math.random() * (window.innerWidth - HOLE_SIZE - 5));
-            const top = Math.floor(Math.random() * (window.innerHeight - HOLE_SIZE - 5));
+            const left = Math.floor(Math.random() * (W - HOLE_SIZE - 5));
+            const top = Math.floor(Math.random() * (H - HOLE_SIZE - 5));
             if (!holeCollidesWithBarriers(left, top, hardBarriersRef.current, HOLE_SIZE)) {
                 return { left: `${left}px`, top: `${top}px` };
             }
@@ -175,8 +199,9 @@ const Game = forwardRef(({ onScoreChange, onLevelChange, onHighScoreChange, onGa
         }
         if (levelRef.current >= 3 && newHoleStyles && newHoleStyles.left && newHoleStyles.left.includes('px')) {
             const spawnPos = pos || currentPosRef.current;
-            const W = window.innerWidth;
-            const H = window.innerHeight;
+            const dims = getContainerDims();
+            const W = dims.w || window.innerWidth;
+            const H = dims.h || window.innerHeight;
             const newMines = placeMines(mineCountRef.current, spawnPos, newHoleStyles, hardBarriersRef.current, W, H);
             minesRef.current = newMines;
             setMines(newMines);
@@ -216,7 +241,8 @@ const Game = forwardRef(({ onScoreChange, onLevelChange, onHighScoreChange, onGa
         minesRef.current = [];
         mineCountRef.current = INITIAL_MINE_COUNT;
         setMines([]);
-        const hole = randomHolePosition();
+        const dims = getContainerDims();
+        const hole = randomHolePosition(dims.w || window.innerWidth, dims.h || window.innerHeight);
         setHoleStyles(hole);
         holeStylesRef.current = hole;
         updateGameState(GAME_STATE.PLAYING);
@@ -251,14 +277,18 @@ const Game = forwardRef(({ onScoreChange, onLevelChange, onHighScoreChange, onGa
     const lastAlignmentTimeRef = useRef(0);
 
     const onMove = useCallback((newLeft, newTop) => {
+        const dims = getContainerDims();
+        const W = dims.w || window.innerWidth;
+        const H = dims.h || window.innerHeight;
+
         // Track trajectory in level 2+
         if (levelRef.current >= 2) {
             const nowMs = Date.now();
             if (nowMs - lastTrajectoryTimeRef.current > TRAJECTORY_SAMPLE_INTERVAL) {
                 lastTrajectoryTimeRef.current = nowMs;
                 const point = {
-                    x: (newLeft / 100) * window.innerWidth + BLOCK_SIZE / 2,
-                    y: (newTop / 100) * window.innerHeight + BLOCK_SIZE / 2,
+                    x: (newLeft / 100) * W + BLOCK_SIZE / 2,
+                    y: (newTop / 100) * H + BLOCK_SIZE / 2,
                 };
                 if (trajectoryRef.current.length < MAX_TRAJECTORY_POINTS) {
                     trajectoryRef.current = [...trajectoryRef.current, point];
@@ -271,7 +301,7 @@ const Game = forwardRef(({ onScoreChange, onLevelChange, onHighScoreChange, onGa
         if (levelRef.current >= 3) {
             const nowMs = Date.now();
             if (nowMs - lastMineHitTimeRef.current > MINE_HIT_DEBOUNCE &&
-                wouldCollideWithMinesList(newLeft, newTop, minesRef.current, window.innerWidth, window.innerHeight)) {
+                wouldCollideWithMinesList(newLeft, newTop, minesRef.current, W, H)) {
                 lastMineHitTimeRef.current = nowMs;
                 handleMineBlast();
                 return;
@@ -345,6 +375,7 @@ const Game = forwardRef(({ onScoreChange, onLevelChange, onHighScoreChange, onGa
         gameStateRef,
         barrierActiveRef,
         hardBarriersRef,
+        getContainerDims,
         setShapeStyles,
         onMove,
     });
@@ -365,8 +396,9 @@ const Game = forwardRef(({ onScoreChange, onLevelChange, onHighScoreChange, onGa
             holeStylesRef.current = hole;
         }
         if (level === 3 && newHoleStyles && newHoleStyles.left.includes('px')) {
-            const W = window.innerWidth;
-            const H = window.innerHeight;
+            const dims = getContainerDims();
+            const W = dims.w || window.innerWidth;
+            const H = dims.h || window.innerHeight;
             mineCountRef.current = INITIAL_MINE_COUNT;
             const initialMines = placeMines(INITIAL_MINE_COUNT, spawnPos, newHoleStyles, hardBarriersRef.current, W, H);
             minesRef.current = initialMines;
@@ -376,7 +408,7 @@ const Game = forwardRef(({ onScoreChange, onLevelChange, onHighScoreChange, onGa
     }, [level]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
-        <div className={styles.gameContainer} id={styles.gameContainer} role="application" aria-label="TETRUTO game area">
+        <div ref={containerRef} className={styles.gameContainer} id={styles.gameContainer} role="application" aria-label="TETRUTO game area">
             {loading ? (
                 <div className={styles.loaderContainer}>
                     <BeatLoader color="#3498db" size={15} margin={4} />

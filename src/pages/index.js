@@ -8,6 +8,35 @@ import Leaderboard from '../components/Leaderboard';
 import styles from '../styles/Home.module.css';
 import { GAME_STATE } from '../constants';
 
+const isMobileDevice = () => {
+  if (typeof window === 'undefined') return true; // SSR: assume mobile
+  const ua = navigator.userAgent || '';
+  const mobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+  const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  const narrowScreen = window.innerWidth <= 1024;
+  return mobileUA || (hasTouch && narrowScreen);
+};
+
+const DesktopBlocker = () => (
+  <div className={styles.gameWrapper}>
+    <Head>
+      <title>TETRUTO - Mobile Only</title>
+      <link rel="icon" type="image/svg+xml" href="/logo-icon.svg" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+    </Head>
+    <div className={styles.desktopBlocker}>
+      <div className={styles.blockerIcon}>📱</div>
+      <h1 className={styles.blockerTitle}>TETRUTO</h1>
+      <p className={styles.blockerText}>
+        This game uses device motion controls and is designed exclusively for mobile devices.
+      </p>
+      <p className={styles.blockerHint}>
+        Open this page on your phone to play.
+      </p>
+    </div>
+  </div>
+);
+
 // SVG icons — clean, monochrome, 16x16 viewBox
 const PauseIcon = () => (
   <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
@@ -40,6 +69,11 @@ const Home = () => {
   const [highScore, setHighScore] = useState(0);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [gameState, setGameState] = useState(GAME_STATE.PLAYING);
+  const [isMobile, setIsMobile] = useState(true); // default true to avoid flash
+
+  useEffect(() => {
+    setIsMobile(isMobileDevice());
+  }, []);
 
   useEffect(() => {
     try {
@@ -50,6 +84,8 @@ const Home = () => {
       }
     } catch (e) {}
   }, []);
+
+  if (!isMobile) return <DesktopBlocker />;
 
   const handleGameOver = useCallback((finalScore) => {
     if (session && finalScore > 0) {
