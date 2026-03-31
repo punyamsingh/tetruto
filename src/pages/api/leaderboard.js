@@ -17,8 +17,8 @@ export default async function handler(req, res) {
         })
         .from(scores)
         .innerJoin(users, eq(scores.userId, users.id))
-        .orderBy(desc(scores.score))
-        .limit(10);
+        .orderBy(desc(scores.score), desc(scores.createdAt))
+        .limit(5);
 
       return res.status(200).json(topScores);
     } catch (err) {
