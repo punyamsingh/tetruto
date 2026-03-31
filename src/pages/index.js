@@ -12,9 +12,12 @@ const isMobileDevice = () => {
   if (typeof window === 'undefined') return true; // SSR: assume mobile
   const ua = navigator.userAgent || '';
   const mobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+  // Real mobile devices have the gyroscope API the game needs
+  const hasDeviceOrientation = 'DeviceOrientationEvent' in window;
   const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
   const narrowScreen = window.innerWidth <= 1024;
-  return mobileUA || (hasTouch && narrowScreen);
+  // Must have mobile UA AND (gyro or touch on a small screen)
+  return mobileUA && hasDeviceOrientation && hasTouch && narrowScreen;
 };
 
 const DesktopBlocker = () => (
@@ -73,6 +76,10 @@ const Home = () => {
 
   useEffect(() => {
     setIsMobile(isMobileDevice());
+    // Re-check on resize so toggling DevTools device mode doesn't bypass the gate
+    const onResize = () => setIsMobile(isMobileDevice());
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
   }, []);
 
   useEffect(() => {
