@@ -11,7 +11,6 @@ export const MINE_HALF = 8;
 
 // Pathfinding
 export const PATH_CELL = 25;
-export const MAX_MINES = 10;
 
 // Movement
 export const SENSITIVITY = 10;

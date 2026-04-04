@@ -1,4 +1,4 @@
-import { OVERLAP_THRESHOLD, LEVEL_2_THRESHOLD, LEVEL_3_THRESHOLD, MAX_MINES } from '../constants';
+import { OVERLAP_THRESHOLD, LEVEL_2_THRESHOLD, LEVEL_3_THRESHOLD } from '../constants';
 
 describe('Game constants', () => {
     test('overlap threshold is 2%', () => {
@@ -11,10 +11,6 @@ describe('Game constants', () => {
 
     test('level 3 at score 10', () => {
         expect(LEVEL_3_THRESHOLD).toBe(10);
-    });
-
-    test('max mines is 10', () => {
-        expect(MAX_MINES).toBe(10);
     });
 });
 
@@ -57,13 +53,4 @@ describe('Level progression', () => {
     });
 });
 
-describe('Mine count cap', () => {
-    test('mine count caps at MAX_MINES', () => {
-        let mineCount = 9;
-        mineCount = Math.min(mineCount + 1, MAX_MINES);
-        expect(mineCount).toBe(10);
 
-        mineCount = Math.min(mineCount + 1, MAX_MINES);
-        expect(mineCount).toBe(10); // still 10, capped
-    });
-});

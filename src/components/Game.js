@@ -10,7 +10,7 @@ import {
     LEVEL_RULES, BLOCK_SIZE, HOLE_SIZE, OVERLAP_THRESHOLD,
     SCORE_COOLDOWN, MINE_HIT_DEBOUNCE, TRAJECTORY_SAMPLE_INTERVAL,
     LEVEL_2_THRESHOLD, LEVEL_3_THRESHOLD, INITIAL_MINE_COUNT,
-    MAX_MINES, MAX_TRAJECTORY_POINTS, LOADING_DURATION,
+    MAX_TRAJECTORY_POINTS, LOADING_DURATION,
     SCORE_FLASH_DURATION, BLAST_FLASH_DURATION,
     GAME_STATE,
 } from '../constants';
@@ -359,7 +359,7 @@ const Game = forwardRef(({ onScoreChange, onLevelChange, onHighScoreChange, onGa
 
                 if (!levelJustChanged) {
                     if (levelRef.current >= 3) {
-                        mineCountRef.current = Math.min(mineCountRef.current + 1, MAX_MINES);
+                        mineCountRef.current += 1;
                     }
                     resetGame();
                 }
